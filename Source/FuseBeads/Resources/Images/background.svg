@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+  <!-- Warm cream pegboard background for app pages -->
+  <defs>
+    <pattern id="pegboard" x="0" y="0" width="48" height="48" patternUnits="userSpaceOnUse">
+      <rect width="48" height="48" fill="#FDF6EC"/>
+      <circle cx="24" cy="24" r="6" fill="#DEC9AB" opacity="0.65"/>
+    </pattern>
+    <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#FDF6EC" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#E8C89A" stop-opacity="0.25"/>
+    </radialGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#pegboard)"/>
+  <rect width="1080" height="1920" fill="url(#vignette)"/>
+</svg>

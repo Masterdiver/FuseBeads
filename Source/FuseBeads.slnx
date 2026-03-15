@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="FuseBeads.Application/FuseBeads.Application.csproj" />
+  <Project Path="FuseBeads.Domain/FuseBeads.Domain.csproj" />
+  <Project Path="FuseBeads.Infrastructure/FuseBeads.Infrastructure.csproj" />
+  <Project Path="FuseBeads/FuseBeads.csproj" />
+</Solution>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <style name="Maui.SplashTheme" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/colorPrimary</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/maui_splash_image</item>
+        <item name="postSplashScreenTheme">@style/Maui.MainTheme</item>
+    </style>
+
+    <style name="Maui.MainTheme" parent="Theme.MaterialComponents.DayNight">
+    </style>
+</resources>

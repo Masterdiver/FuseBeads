@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FuseBeads.ViewModels"
+             x:Class="FuseBeads.MainPage"
+             x:DataType="vm:MainViewModel"
+             Title="Bügelperlen-Designer">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16">
+
+        <!-- Header / Controls -->
+        <VerticalStackLayout Grid.Row="0" Spacing="12">
+
+            <Label Text="Bügelperlen-Muster Generator"
+                   FontSize="24" FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+
+            <Label Text="{Binding StatusText}"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   TextColor="{StaticResource Primary}" />
+
+            <!-- Settings -->
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="10" Padding="0,4">
+                <Button Text="📷 Bild auswählen"
+                        Command="{Binding PickImageCommand}"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+                        Grid.Column="0"
+                        HorizontalOptions="Start" />
+
+                <Label Text="Breite:" VerticalOptions="Center" Grid.Column="1" />
+                <Entry Text="{Binding GridWidth}" Keyboard="Numeric" WidthRequest="60" Grid.Column="2" />
+
+                <Label Text="Höhe:" VerticalOptions="Center" Grid.Column="3" />
+                <Entry Text="{Binding GridHeight}" Keyboard="Numeric" WidthRequest="60" Grid.Column="4" />
+            </Grid>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                               HeightRequest="30" Color="{StaticResource Primary}" />
+        </VerticalStackLayout>
+
+        <!-- Main Content -->
+        <ScrollView Grid.Row="1" Padding="0,8,0,0">
+            <VerticalStackLayout Spacing="16">
+
+                <!-- Images side by side -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16"
+                      IsVisible="{Binding HasPattern}">
+
+                    <!-- Original Image -->
+                    <Border Grid.Column="0" Padding="8"
+                            StrokeShape="RoundRectangle 8"
+                            Stroke="{StaticResource Primary}">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Originalbild" FontAttributes="Bold"
+                                   HorizontalOptions="Center" />
+                            <Image Source="{Binding OriginalImageSource}"
+                                   Aspect="AspectFit" MaximumHeightRequest="400" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Pattern Image -->
+                    <Border Grid.Column="1" Padding="8"
+                            StrokeShape="RoundRectangle 8"
+                            Stroke="{StaticResource Primary}">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Bügelperlenmuster" FontAttributes="Bold"
+                                   HorizontalOptions="Center" />
+                            <Image Source="{Binding PatternImageSource}"
+                                   Aspect="AspectFit" MaximumHeightRequest="400" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- Stats -->
+                <Border Padding="12" StrokeShape="RoundRectangle 8"
+                        IsVisible="{Binding HasPattern}"
+                        Stroke="{StaticResource Primary}">
+                    <HorizontalStackLayout Spacing="24" HorizontalOptions="Center">
+                        <VerticalStackLayout>
+                            <Label Text="Perlen gesamt" FontSize="12" TextColor="Gray" />
+                            <Label Text="{Binding TotalBeads}" FontSize="20" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout>
+                            <Label Text="Farben" FontSize="12" TextColor="Gray" />
+                            <Label Text="{Binding TotalColors}" FontSize="20" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout>
+                            <Label Text="Raster" FontSize="12" TextColor="Gray" />
+                            <Label FontSize="20" FontAttributes="Bold">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding GridWidth}" />
+                                        <Span Text=" × " />
+                                        <Span Text="{Binding GridHeight}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+                </Border>
+
+                <!-- Color Legend / Anleitung -->
+                <Border Padding="12" StrokeShape="RoundRectangle 8"
+                        IsVisible="{Binding HasPattern}"
+                        Stroke="{StaticResource Primary}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Farbenliste &amp; Anleitung" FontSize="18"
+                               FontAttributes="Bold" />
+                        <Label Text="Sortiert nach Anzahl — kaufe die folgenden Bügelperlen-Farben:"
+                               FontSize="12" TextColor="Gray" />
+
+                        <!-- Column Headers -->
+                        <Grid ColumnDefinitions="40,*,80,60" Padding="0,4">
+                            <Label Text="" Grid.Column="0" FontAttributes="Bold" />
+                            <Label Text="Farbe" Grid.Column="1" FontAttributes="Bold" />
+                            <Label Text="Anzahl" Grid.Column="2" FontAttributes="Bold" />
+                            <Label Text="%" Grid.Column="3" FontAttributes="Bold" />
+                        </Grid>
+
+                        <CollectionView ItemsSource="{Binding ColorInfos}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ColorInfoViewModel">
+                                    <Grid ColumnDefinitions="40,*,80,60"
+                                          Padding="0,3" RowDefinitions="Auto">
+                                        <BoxView Grid.Column="0"
+                                                 Color="{Binding DisplayColor}"
+                                                 WidthRequest="28" HeightRequest="28"
+                                                 CornerRadius="14"
+                                                 HorizontalOptions="Center"
+                                                 VerticalOptions="Center" />
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="{Binding ColorName}" FontSize="14" />
+                                            <Label Text="{Binding HexCode}" FontSize="10" TextColor="Gray" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="2" Text="{Binding Count}"
+                                               FontSize="14" VerticalOptions="Center" />
+                                        <Label Grid.Column="3"
+                                               Text="{Binding Percentage, StringFormat='{0:F1}%'}"
+                                               FontSize="14" VerticalOptions="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Instructions -->
+                <Border Padding="12" StrokeShape="RoundRectangle 8"
+                        IsVisible="{Binding HasPattern}"
+                        Stroke="{StaticResource Primary}">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Anleitung" FontSize="18" FontAttributes="Bold" />
+                        <Label Text="1. Besorge alle oben aufgelisteten Bügelperlen-Farben." FontSize="14" />
+                        <Label Text="2. Lege die Perlen Reihe für Reihe auf eine Steckplatte gemäß dem Muster." FontSize="14" />
+                        <Label Text="3. Lege Backpapier über die Perlen." FontSize="14" />
+                        <Label Text="4. Bügle vorsichtig mit einem Bügeleisen auf mittlerer Hitze, bis die Perlen leicht verschmelzen." FontSize="14" />
+                        <Label Text="5. Lass das Muster abkühlen und löse es vorsichtig von der Platte." FontSize="14" />
+                        <Label Text="6. Optional: Bügle auch die Rückseite für bessere Stabilität." FontSize="14" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Print Button -->
+        <Button Grid.Row="2"
+                Text="🖨️ Drucken"
+                Command="{Binding PrintCommand}"
+                IsEnabled="{Binding HasPattern}"
+                Margin="0,8,0,0" />
+    </Grid>
+
+</ContentPage>

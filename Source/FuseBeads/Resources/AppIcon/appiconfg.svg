@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="456" height="456" viewBox="0 0 456 456" xmlns="http://www.w3.org/2000/svg">
+  <!-- Colorful bead heart: 7 cols x 6 rows, spacing=60, bead_r=24 -->
+  <!-- Col x: 48,108,168,228,288,348,408 | Row y: 78,138,198,258,318,378 -->
+
+  <!-- Row 0: y=78, Red #FF3547 — cols 1,2,4,5 -->
+  <circle cx="108" cy="78" r="24" fill="#FF3547"/><circle cx="108" cy="78" r="8" fill="#CC0020" opacity="0.7"/><circle cx="99" cy="69" r="6" fill="white" opacity="0.35"/>
+  <circle cx="168" cy="78" r="24" fill="#FF3547"/><circle cx="168" cy="78" r="8" fill="#CC0020" opacity="0.7"/><circle cx="159" cy="69" r="6" fill="white" opacity="0.35"/>
+  <circle cx="288" cy="78" r="24" fill="#FF3547"/><circle cx="288" cy="78" r="8" fill="#CC0020" opacity="0.7"/><circle cx="279" cy="69" r="6" fill="white" opacity="0.35"/>
+  <circle cx="348" cy="78" r="24" fill="#FF3547"/><circle cx="348" cy="78" r="8" fill="#CC0020" opacity="0.7"/><circle cx="339" cy="69" r="6" fill="white" opacity="0.35"/>
+
+  <!-- Row 1: y=138, Orange #FF8C00 — cols 0-6 -->
+  <circle cx="48"  cy="138" r="24" fill="#FF8C00"/><circle cx="48"  cy="138" r="8" fill="#CC7000" opacity="0.7"/><circle cx="39"  cy="129" r="6" fill="white" opacity="0.35"/>
+  <circle cx="108" cy="138" r="24" fill="#FF8C00"/><circle cx="108" cy="138" r="8" fill="#CC7000" opacity="0.7"/><circle cx="99"  cy="129" r="6" fill="white" opacity="0.35"/>
+  <circle cx="168" cy="138" r="24" fill="#FF8C00"/><circle cx="168" cy="138" r="8" fill="#CC7000" opacity="0.7"/><circle cx="159" cy="129" r="6" fill="white" opacity="0.35"/>
+  <circle cx="228" cy="138" r="24" fill="#FF8C00"/><circle cx="228" cy="138" r="8" fill="#CC7000" opacity="0.7"/><circle cx="219" cy="129" r="6" fill="white" opacity="0.35"/>
+  <circle cx="288" cy="138" r="24" fill="#FF8C00"/><circle cx="288" cy="138" r="8" fill="#CC7000" opacity="0.7"/><circle cx="279" cy="129" r="6" fill="white" opacity="0.35"/>
+  <circle cx="348" cy="138" r="24" fill="#FF8C00"/><circle cx="348" cy="138" r="8" fill="#CC7000" opacity="0.7"/><circle cx="339" cy="129" r="6" fill="white" opacity="0.35"/>
+  <circle cx="408" cy="138" r="24" fill="#FF8C00"/><circle cx="408" cy="138" r="8" fill="#CC7000" opacity="0.7"/><circle cx="399" cy="129" r="6" fill="white" opacity="0.35"/>
+
+  <!-- Row 2: y=198, Yellow #FFD700 — cols 0-6 -->
+  <circle cx="48"  cy="198" r="24" fill="#FFD700"/><circle cx="48"  cy="198" r="8" fill="#CCA800" opacity="0.7"/><circle cx="39"  cy="189" r="6" fill="white" opacity="0.35"/>
+  <circle cx="108" cy="198" r="24" fill="#FFD700"/><circle cx="108" cy="198" r="8" fill="#CCA800" opacity="0.7"/><circle cx="99"  cy="189" r="6" fill="white" opacity="0.35"/>
+  <circle cx="168" cy="198" r="24" fill="#FFD700"/><circle cx="168" cy="198" r="8" fill="#CCA800" opacity="0.7"/><circle cx="159" cy="189" r="6" fill="white" opacity="0.35"/>
+  <circle cx="228" cy="198" r="24" fill="#FFD700"/><circle cx="228" cy="198" r="8" fill="#CCA800" opacity="0.7"/><circle cx="219" cy="189" r="6" fill="white" opacity="0.35"/>
+  <circle cx="288" cy="198" r="24" fill="#FFD700"/><circle cx="288" cy="198" r="8" fill="#CCA800" opacity="0.7"/><circle cx="279" cy="189" r="6" fill="white" opacity="0.35"/>
+  <circle cx="348" cy="198" r="24" fill="#FFD700"/><circle cx="348" cy="198" r="8" fill="#CCA800" opacity="0.7"/><circle cx="339" cy="189" r="6" fill="white" opacity="0.35"/>
+  <circle cx="408" cy="198" r="24" fill="#FFD700"/><circle cx="408" cy="198" r="8" fill="#CCA800" opacity="0.7"/><circle cx="399" cy="189" r="6" fill="white" opacity="0.35"/>
+
+  <!-- Row 3: y=258, Green #36BA49 — cols 1-5 -->
+  <circle cx="108" cy="258" r="24" fill="#36BA49"/><circle cx="108" cy="258" r="8" fill="#228A32" opacity="0.7"/><circle cx="99"  cy="249" r="6" fill="white" opacity="0.35"/>
+  <circle cx="168" cy="258" r="24" fill="#36BA49"/><circle cx="168" cy="258" r="8" fill="#228A32" opacity="0.7"/><circle cx="159" cy="249" r="6" fill="white" opacity="0.35"/>
+  <circle cx="228" cy="258" r="24" fill="#36BA49"/><circle cx="228" cy="258" r="8" fill="#228A32" opacity="0.7"/><circle cx="219" cy="249" r="6" fill="white" opacity="0.35"/>
+  <circle cx="288" cy="258" r="24" fill="#36BA49"/><circle cx="288" cy="258" r="8" fill="#228A32" opacity="0.7"/><circle cx="279" cy="249" r="6" fill="white" opacity="0.35"/>
+  <circle cx="348" cy="258" r="24" fill="#36BA49"/><circle cx="348" cy="258" r="8" fill="#228A32" opacity="0.7"/><circle cx="339" cy="249" r="6" fill="white" opacity="0.35"/>
+
+  <!-- Row 4: y=318, Blue #2979FF — cols 2-4 -->
+  <circle cx="168" cy="318" r="24" fill="#2979FF"/><circle cx="168" cy="318" r="8" fill="#0046C0" opacity="0.7"/><circle cx="159" cy="309" r="6" fill="white" opacity="0.35"/>
+  <circle cx="228" cy="318" r="24" fill="#2979FF"/><circle cx="228" cy="318" r="8" fill="#0046C0" opacity="0.7"/><circle cx="219" cy="309" r="6" fill="white" opacity="0.35"/>
+  <circle cx="288" cy="318" r="24" fill="#2979FF"/><circle cx="288" cy="318" r="8" fill="#0046C0" opacity="0.7"/><circle cx="279" cy="309" r="6" fill="white" opacity="0.35"/>
+
+  <!-- Row 5: y=378, Purple #9C27B0 — col 3 -->
+  <circle cx="228" cy="378" r="24" fill="#9C27B0"/><circle cx="228" cy="378" r="8" fill="#6A1B9A" opacity="0.7"/><circle cx="219" cy="369" r="6" fill="white" opacity="0.35"/>
+</svg>
