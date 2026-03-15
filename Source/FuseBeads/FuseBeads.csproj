@@ -83,7 +83,12 @@
 
 	<ItemGroup>
 	  <Folder Include="Doc\" />
+	  <Folder Include=".github\" />
 	  <Folder Include="Services\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\.github\copilot-instructions.md" Link=".github\copilot-instructions.md" />
 	</ItemGroup>
 
 </Project>
