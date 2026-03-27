@@ -57,6 +57,30 @@ public class SkiaPatternRenderer : IPatternRenderer
                 canvas.DrawCircle(cx, cy, beadRadius, beadPaint);
                 canvas.DrawCircle(cx, cy, beadRadius, gridPaint);
                 canvas.DrawCircle(cx, cy, holeRadius, holePaint);
+
+                if (pattern.IsChecked(row, col))
+                {
+                    using var overlayPaint = new SKPaint();
+                    overlayPaint.Color = new SKColor(60, 60, 60, 170);
+                    overlayPaint.Style = SKPaintStyle.Fill;
+                    overlayPaint.IsAntialias = true;
+                    canvas.DrawCircle(cx, cy, beadRadius, overlayPaint);
+
+                    using var checkPaint = new SKPaint();
+                    checkPaint.Color = SKColors.White;
+                    checkPaint.IsAntialias = true;
+                    checkPaint.Style = SKPaintStyle.Stroke;
+                    checkPaint.StrokeWidth = beadRadius * 0.22f;
+                    checkPaint.StrokeCap = SKStrokeCap.Round;
+                    checkPaint.StrokeJoin = SKStrokeJoin.Round;
+
+                    float s = beadRadius * 0.45f;
+                    using var path = new SKPath();
+                    path.MoveTo(cx - s, cy);
+                    path.LineTo(cx - s * 0.2f, cy + s * 0.7f);
+                    path.LineTo(cx + s, cy - s * 0.65f);
+                    canvas.DrawPath(path, checkPaint);
+                }
             }
         }
 

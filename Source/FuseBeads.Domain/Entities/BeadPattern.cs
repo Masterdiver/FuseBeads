@@ -16,6 +16,19 @@ public class BeadPattern
         Grid = new BeadCell?[rows, columns];
     }
 
+    public HashSet<(int Row, int Column)> CheckedCells { get; } = [];
+
+    public void ToggleChecked(int row, int column)
+    {
+        var key = (row, column);
+        if (!CheckedCells.Remove(key))
+            CheckedCells.Add(key);
+    }
+
+    public bool IsChecked(int row, int column) => CheckedCells.Contains((row, column));
+
+    public int CheckedBeadsCount => CheckedCells.Count;
+
     public void SetCell(int row, int column, BeadColor color)
     {
         Grid[row, column] = new BeadCell(row, column, color);

@@ -17,6 +17,7 @@ public static class DependencyInjection
         services.AddSingleton<IPatternRenderer, SkiaPatternRenderer>();
         services.AddSingleton<IPrintRenderer, SkiaPrintRenderer>();
         services.AddSingleton<IPatternStorage, JsonPatternStorage>();
+        services.AddSingleton<IProgressStorage, JsonProgressStorage>();
         services.AddTransient<IPatternService, PatternService>();
         return services;
     }

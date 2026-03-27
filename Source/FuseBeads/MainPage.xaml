@@ -98,11 +98,15 @@
                        Placeholder="H" IsEnabled="{Binding ShowBoardGrid}" />
             </Grid>
 
-            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
-                               HeightRequest="20" Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
-
             </VerticalStackLayout>
         </Grid>
+
+        <!-- Loading indicator (always visible, outside collapsible panel) -->
+        <ActivityIndicator Grid.Row="0"
+                           IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                           HeightRequest="20"
+                           VerticalOptions="End" HorizontalOptions="Center"
+                           Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
 
         <!-- Main Content -->
         <ScrollView Grid.Row="1" Padding="0,8,0,0">
@@ -136,9 +140,11 @@
                                         VerticalScrollBarVisibility="Always">
                                 <Image x:Name="PatternImage"
                                        Source="{Binding PatternImageSource}"
-                                       Aspect="AspectFit"
-                                       MinimumWidthRequest="300"
-                                       MinimumHeightRequest="300" />
+                                       Aspect="Fill">
+                                    <Image.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnPatternTapped" />
+                                    </Image.GestureRecognizers>
+                                </Image>
                             </ScrollView>
                             <!-- Zoom controls -->
                             <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
@@ -163,6 +169,10 @@
                         <VerticalStackLayout>
                             <Label Text="{helpers:Localize TotalBeads}" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
                             <Label Text="{Binding TotalBeads}" FontSize="20" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout>
+                            <Label Text="{helpers:Localize CheckedBeads}" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+                            <Label Text="{Binding CheckedBeads}" FontSize="20" FontAttributes="Bold" />
                         </VerticalStackLayout>
                         <VerticalStackLayout>
                             <Label Text="{helpers:Localize Colors}" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
@@ -232,7 +242,7 @@
 
         <!-- Bottom Action Buttons -->
         <ScrollView Grid.Row="2" Orientation="Horizontal" Margin="0,8,0,0">
-            <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+            <HorizontalStackLayout Spacing="8">
                 <Button Text="{helpers:Localize Instructions}"
                         Command="{Binding ShowInstructionsCommand}"
                         FontSize="12" Padding="10,8" />
@@ -250,6 +260,9 @@
                         FontSize="12" Padding="10,8" />
                 <Button Text="{helpers:Localize ShoppingList}"
                         Command="{Binding ShareShoppingListCommand}"
+                        FontSize="12" Padding="10,8" />
+                <Button Text="{helpers:Localize ResetProgress}"
+                        Command="{Binding ResetProgressCommand}"
                         FontSize="12" Padding="10,8" />
             </HorizontalStackLayout>
         </ScrollView>

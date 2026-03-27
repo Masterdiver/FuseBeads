@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using FuseBeads.Domain.Entities;
 using FuseBeads.Domain.Interfaces;
 
@@ -8,12 +9,13 @@ public class JsonPatternStorage : IPatternStorage
 {
     public async Task SavePatternAsync(string filePath, BeadPattern pattern)
     {
-        var dto = new PatternDto
-        {
-            Rows = pattern.Rows,
-            Columns = pattern.Columns,
-            Cells = new List<CellDto>()
-        };
+        await using var stream = File.Create(filePath);
+        await SavePatternToStreamAsync(stream, pattern);
+    }
+
+    public async Task SavePatternToStreamAsync(Stream stream, BeadPattern pattern)
+    {
+        var dto = new PatternDto { Rows = pattern.Rows, Columns = pattern.Columns };
 
         for (int r = 0; r < pattern.Rows; r++)
         {
@@ -33,14 +35,13 @@ public class JsonPatternStorage : IPatternStorage
             }
         }
 
-        var json = JsonSerializer.Serialize(dto, new JsonSerializerOptions { WriteIndented = true });
-        await File.WriteAllTextAsync(filePath, json);
+        await JsonSerializer.SerializeAsync(stream, dto, PatternStorageJsonContext.Default.PatternDto);
     }
 
     public async Task<BeadPattern> LoadPatternAsync(string filePath)
     {
-        var json = await File.ReadAllTextAsync(filePath);
-        var dto = JsonSerializer.Deserialize<PatternDto>(json)
+        await using var stream = File.OpenRead(filePath);
+        var dto = await JsonSerializer.DeserializeAsync(stream, PatternStorageJsonContext.Default.PatternDto)
             ?? throw new InvalidOperationException("Invalid pattern file.");
 
         var pattern = new BeadPattern(dto.Rows, dto.Columns);
@@ -52,21 +53,25 @@ public class JsonPatternStorage : IPatternStorage
 
         return pattern;
     }
-
-    private class PatternDto
-    {
-        public int Rows { get; set; }
-        public int Columns { get; set; }
-        public List<CellDto> Cells { get; set; } = [];
-    }
-
-    private class CellDto
-    {
-        public int Row { get; set; }
-        public int Column { get; set; }
-        public string ColorName { get; set; } = string.Empty;
-        public byte R { get; set; }
-        public byte G { get; set; }
-        public byte B { get; set; }
-    }
 }
+
+internal class PatternDto
+{
+    public int Rows { get; set; }
+    public int Columns { get; set; }
+    public List<CellDto> Cells { get; set; } = [];
+}
+
+internal class CellDto
+{
+    public int Row { get; set; }
+    public int Column { get; set; }
+    public string ColorName { get; set; } = string.Empty;
+    public byte R { get; set; }
+    public byte G { get; set; }
+    public byte B { get; set; }
+}
+
+[JsonSerializable(typeof(PatternDto))]
+[JsonSerializable(typeof(CellDto))]
+internal partial class PatternStorageJsonContext : JsonSerializerContext { }

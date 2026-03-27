@@ -44,6 +44,7 @@
   <data name="ShoppingList" xml:space="preserve"><value>🛒 Einkaufsliste</value></data>
   <data name="Undo" xml:space="preserve"><value>↩ Rückgängig</value></data>
   <data name="Redo" xml:space="preserve"><value>↪ Wiederholen</value></data>
+  <data name="ResetProgress" xml:space="preserve"><value>☐ Fortschritt zurücksetzen</value></data>
   <data name="Back" xml:space="preserve"><value>← Zurück</value></data>
   <data name="Regenerate" xml:space="preserve"><value>🔄 Aktualisieren</value></data>
 
@@ -60,6 +61,7 @@
   <data name="OriginalImage" xml:space="preserve"><value>Originalbild</value></data>
   <data name="BeadPattern" xml:space="preserve"><value>Bügelperlenmuster</value></data>
   <data name="TotalBeads" xml:space="preserve"><value>Perlen gesamt</value></data>
+  <data name="CheckedBeads" xml:space="preserve"><value>Abgehakt</value></data>
   <data name="Colors" xml:space="preserve"><value>Farben</value></data>
   <data name="Grid" xml:space="preserve"><value>Raster</value></data>
   <data name="ColorList" xml:space="preserve"><value>Farbenliste</value></data>

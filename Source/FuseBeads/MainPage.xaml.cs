@@ -12,12 +12,24 @@ public partial class MainPage
         InitializeComponent();
         BindingContext = viewModel;
         Loaded += (_, _) => ApplySafeAreaPadding();
+        viewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(MainViewModel.PatternImageSource))
+                ApplyZoom();
+        };
     }
 
-    protected override void OnAppearing()
+    private bool _initialized;
+
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
         ApplySafeAreaPadding();
+        if (!_initialized && BindingContext is MainViewModel vm)
+        {
+            _initialized = true;
+            await vm.InitializeAsync();
+        }
     }
 
     private void ApplySafeAreaPadding()
@@ -79,7 +91,28 @@ public partial class MainPage
 
     private void ApplyZoom()
     {
-        PatternImage.Scale = _zoomFactor;
+        if (BindingContext is not MainViewModel vm || !vm.HasPattern) return;
+
+        PatternImage.WidthRequest = vm.GridWidth * vm.BeadSizePx * _zoomFactor;
+        PatternImage.HeightRequest = vm.GridHeight * vm.BeadSizePx * _zoomFactor;
         ZoomLabel.Text = $"{_zoomFactor * 100:F0}%";
+    }
+
+    private void OnPatternTapped(object? sender, TappedEventArgs e)
+    {
+        if (BindingContext is not MainViewModel vm) return;
+        if (!vm.HasPattern) return;
+
+        var pos = e.GetPosition(PatternImage);
+        if (pos is null) return;
+
+        double w = PatternImage.WidthRequest;
+        double h = PatternImage.HeightRequest;
+        if (w <= 0 || h <= 0) return;
+
+        int col = (int)(pos.Value.X / w * vm.GridWidth);
+        int row = (int)(pos.Value.Y / h * vm.GridHeight);
+
+        vm.ToggleBead(row, col);
     }
 }

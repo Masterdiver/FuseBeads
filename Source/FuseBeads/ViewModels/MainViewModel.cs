@@ -1,3 +1,4 @@
+using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FuseBeads.Application.DTOs;
@@ -15,7 +16,9 @@ public partial class MainViewModel : ObservableObject
     private readonly IPatternService _patternService;
     private readonly IPrintRenderer _printRenderer;
     private readonly IPatternStorage _patternStorage;
+    private readonly IProgressStorage _progressStorage;
     private readonly IPatternRenderer _patternRenderer;
+    private readonly IFileSaver _fileSaver;
     private PatternResult? _lastPatternResult;
     private byte[]? _lastImageBytes;
 
@@ -26,13 +29,17 @@ public partial class MainViewModel : ObservableObject
         IPatternService patternService,
         IPrintRenderer printRenderer,
         IPatternStorage patternStorage,
+        IProgressStorage progressStorage,
         IBeadColorPaletteFactory paletteFactory,
-        IPatternRenderer patternRenderer)
+        IPatternRenderer patternRenderer,
+        IFileSaver fileSaver)
     {
         _patternService = patternService;
         _printRenderer = printRenderer;
         _patternStorage = patternStorage;
+        _progressStorage = progressStorage;
         _patternRenderer = patternRenderer;
+        _fileSaver = fileSaver;
 
         foreach (var pt in paletteFactory.AvailablePalettes)
             PaletteTypes.Add(pt);
@@ -110,9 +117,16 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _enableDithering;
 
+    // Bead completion tracking
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ResetProgressCommand))]
+    private int _checkedBeads;
+
+    public int BeadSizePx { get; } = 20;
+
     // Controls panel
     [ObservableProperty]
-    private bool _isControlsPanelExpanded = true;
+    private bool _isControlsPanelExpanded;
 
     partial void OnIsControlsPanelExpandedChanged(bool value)
     {
@@ -195,6 +209,8 @@ public partial class MainViewModel : ObservableObject
             _undoStack.Clear();
             _redoStack.Clear();
             UpdateUndoRedoState();
+
+            await _progressStorage.ClearProgressAsync();
         }
         catch (Exception ex)
         {
@@ -239,6 +255,8 @@ public partial class MainViewModel : ObservableObject
             _undoStack.Clear();
             _redoStack.Clear();
             UpdateUndoRedoState();
+
+            await _progressStorage.ClearProgressAsync();
         }
         catch (Exception ex)
         {
@@ -271,7 +289,9 @@ public partial class MainViewModel : ObservableObject
         TotalBeads = patternResult.TotalBeads;
         TotalColors = patternResult.ColorInfos.Count;
         _lastPatternResult = patternResult;
+        CheckedBeads = patternResult.Pattern.CheckedBeadsCount;
         StatusText = string.Format(AppResources.StatusPatternCreated, GridWidth, GridHeight, TotalBeads, TotalColors);
+        _ = AutoSavePatternAsync(patternResult.Pattern);
     }
 
     [RelayCommand(CanExecute = nameof(HasPattern))]
@@ -354,6 +374,8 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
+    private string AutoSavePatternPath => Path.Combine(FileSystem.AppDataDirectory, "current_pattern.json");
+
     // Save pattern
     [RelayCommand(CanExecute = nameof(HasPattern))]
     private async Task SavePatternAsync()
@@ -365,16 +387,13 @@ public partial class MainViewModel : ObservableObject
             IsBusy = true;
             StatusText = AppResources.StatusSaving;
 
-            var filePath = Path.Combine(FileSystem.CacheDirectory, "Bugelperlen-Muster.json");
-            await _patternStorage.SavePatternAsync(filePath, _lastPatternResult.Pattern);
+            using var stream = new MemoryStream();
+            await _patternStorage.SavePatternToStreamAsync(stream, _lastPatternResult.Pattern);
+            stream.Position = 0;
 
-            await Share.Default.RequestAsync(new ShareFileRequest
-            {
-                Title = AppResources.ShareSaveTitle,
-                File = new ShareFile(filePath)
-            });
-
-            StatusText = AppResources.StatusSaved;
+            var result = await _fileSaver.SaveAsync("Bugelperlen-Muster.json", stream, CancellationToken.None);
+            if (result.IsSuccessful)
+                StatusText = AppResources.StatusSaved;
         }
         catch (Exception ex)
         {
@@ -408,42 +427,7 @@ public partial class MainViewModel : ObservableObject
 
             IsBusy = true;
             StatusText = AppResources.StatusLoading;
-
-            var pattern = await _patternStorage.LoadPatternAsync(result.FullPath);
-
-            GridWidth = pattern.Columns;
-            GridHeight = pattern.Rows;
-
-            var summary = pattern.GetColorSummary();
-            var colorInfos = summary.Select(kvp => new ColorInfo
-            {
-                ColorName = kvp.Key.Name,
-                HexCode = kvp.Key.HexCode,
-                Count = kvp.Value,
-                Percentage = Math.Round(100.0 * kvp.Value / pattern.TotalBeads, 1)
-            }).ToList();
-
-            byte[] patternImage;
-            if (ShowBoardGrid)
-                patternImage = _patternRenderer.RenderPattern(pattern, 20, BoardWidth, BoardHeight);
-            else
-                patternImage = _patternRenderer.RenderPattern(pattern);
-
-            var patternResult = new PatternResult
-            {
-                Pattern = pattern,
-                PatternImage = patternImage,
-                ColorInfos = colorInfos
-            };
-
-            ApplyPatternResult(patternResult);
-            OriginalImageSource = null;
-
-            _undoStack.Clear();
-            _redoStack.Clear();
-            UpdateUndoRedoState();
-
-            StatusText = string.Format(AppResources.StatusLoaded, GridWidth, GridHeight, TotalBeads);
+            await LoadPatternFromPathAsync(result.FullPath);
         }
         catch (Exception ex)
         {
@@ -452,6 +436,82 @@ public partial class MainViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    private async Task LoadPatternFromPathAsync(string filePath)
+    {
+        var pattern = await _patternStorage.LoadPatternAsync(filePath);
+
+        GridWidth = pattern.Columns;
+        GridHeight = pattern.Rows;
+
+        var summary = pattern.GetColorSummary();
+        var colorInfos = summary.Select(kvp => new ColorInfo
+        {
+            ColorName = kvp.Key.Name,
+            HexCode = kvp.Key.HexCode,
+            Count = kvp.Value,
+            Percentage = Math.Round(100.0 * kvp.Value / pattern.TotalBeads, 1)
+        }).ToList();
+
+        byte[] patternImage;
+        if (ShowBoardGrid)
+            patternImage = _patternRenderer.RenderPattern(pattern, BeadSizePx, BoardWidth, BoardHeight);
+        else
+            patternImage = _patternRenderer.RenderPattern(pattern, BeadSizePx);
+
+        var patternResult = new PatternResult
+        {
+            Pattern = pattern,
+            PatternImage = patternImage,
+            ColorInfos = colorInfos
+        };
+
+        ApplyPatternResult(patternResult);
+        OriginalImageSource = null;
+
+        _undoStack.Clear();
+        _redoStack.Clear();
+        UpdateUndoRedoState();
+
+        await LoadAndApplyProgressAsync();
+        if (CheckedBeads > 0)
+            RefreshPatternImage();
+
+        StatusText = string.Format(AppResources.StatusLoaded, GridWidth, GridHeight, TotalBeads);
+    }
+
+    public async Task InitializeAsync()
+    {
+        if (!File.Exists(AutoSavePatternPath)) return;
+
+        try
+        {
+            IsBusy = true;
+            StatusText = AppResources.StatusLoading;
+            await LoadPatternFromPathAsync(AutoSavePatternPath);
+        }
+        catch
+        {
+            File.Delete(AutoSavePatternPath);
+            StatusText = AppResources.StatusInitial;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task AutoSavePatternAsync(BeadPattern pattern)
+    {
+        try
+        {
+            await _patternStorage.SavePatternAsync(AutoSavePatternPath, pattern);
+        }
+        catch
+        {
+            // Silent – do not disrupt user workflow
         }
     }
 
@@ -552,6 +612,52 @@ public partial class MainViewModel : ObservableObject
     {
         CanUndo = _undoStack.Count > 0;
         CanRedo = _redoStack.Count > 0;
+    }
+
+    public void ToggleBead(int row, int col)
+    {
+        if (_lastPatternResult is null) return;
+        if (row < 0 || row >= _lastPatternResult.Pattern.Rows) return;
+        if (col < 0 || col >= _lastPatternResult.Pattern.Columns) return;
+        if (_lastPatternResult.Pattern.Grid[row, col] is null) return;
+
+        _lastPatternResult.Pattern.ToggleChecked(row, col);
+        CheckedBeads = _lastPatternResult.Pattern.CheckedBeadsCount;
+        RefreshPatternImage();
+        _ = SaveProgressAsync();
+    }
+
+    [RelayCommand(CanExecute = nameof(HasCheckedBeads))]
+    private async Task ResetProgressAsync()
+    {
+        if (_lastPatternResult is null) return;
+
+        _lastPatternResult.Pattern.CheckedCells.Clear();
+        CheckedBeads = 0;
+        RefreshPatternImage();
+        await _progressStorage.ClearProgressAsync();
+    }
+
+    private bool HasCheckedBeads => CheckedBeads > 0;
+
+    private async Task SaveProgressAsync()
+    {
+        if (_lastPatternResult is null) return;
+        await _progressStorage.SaveProgressAsync(_lastPatternResult.Pattern.CheckedCells);
+    }
+
+    private async Task LoadAndApplyProgressAsync()
+    {
+        if (_lastPatternResult is null) return;
+
+        var checkedCells = await _progressStorage.LoadProgressAsync();
+        _lastPatternResult.Pattern.CheckedCells.Clear();
+        foreach (var cell in checkedCells)
+            _lastPatternResult.Pattern.CheckedCells.Add(cell);
+
+        CheckedBeads = _lastPatternResult.Pattern.CheckedBeadsCount;
+        if (CheckedBeads > 0)
+            RefreshPatternImage();
     }
 
     private record CellEdit(int Row, int Column, BeadColor OldColor, BeadColor NewColor);

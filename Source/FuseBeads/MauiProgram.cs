@@ -1,4 +1,6 @@
-﻿using FuseBeads.Infrastructure;
+﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Storage;
+using FuseBeads.Infrastructure;
 using FuseBeads.ViewModels;
 using Microsoft.Extensions.Logging;
 
@@ -11,6 +13,7 @@ namespace FuseBeads
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -19,6 +22,7 @@ namespace FuseBeads
 
             // Onion Architecture: Infrastructure wires up Domain + Application services
             builder.Services.AddInfrastructure();
+            builder.Services.AddSingleton<IFileSaver>(FileSaver.Default);
 
             // Presentation layer registrations
             builder.Services.AddTransient<MainViewModel>();
