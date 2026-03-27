@@ -29,7 +29,6 @@ public class SkiaPrintRenderer : IPrintRenderer
         y = DrawStats(canvas, y, pattern, colorSummary.Count);
         y = DrawPatternImage(canvas, y, pattern, beadSizePx);
         y = DrawColorLegend(canvas, y, colorSummary, totalBeads);
-        y = DrawInstructions(canvas, y);
 
         using var image = surface.Snapshot();
         using var data = image.Encode(SKEncodedImageFormat.Png, 100);
@@ -41,8 +40,7 @@ public class SkiaPrintRenderer : IPrintRenderer
         // Title + stats + pattern image (max ~1200) + color legend + instructions + margin
         int estimatedPatternHeight = 1200 + 100; // pattern + header
         int colorLegendHeight = 80 + colorCount * 55;
-        int instructionsHeight = 80 + 7 * 50;
-        return PageMargin * 2 + 140 + 100 + estimatedPatternHeight + colorLegendHeight + instructionsHeight + 200;
+        return PageMargin * 2 + 140 + 100 + estimatedPatternHeight + colorLegendHeight + 200;
     }
 
     private static float DrawTitle(SKCanvas canvas, float y)
@@ -313,46 +311,6 @@ public class SkiaPrintRenderer : IPrintRenderer
         };
         canvas.DrawLine(PageMargin, y, PageWidth - PageMargin, y, linePaint);
         y += 20;
-
-        return y;
-    }
-
-    private static float DrawInstructions(SKCanvas canvas, float y)
-    {
-        using var sectionPaint = new SKPaint
-        {
-            Color = SKColors.Black,
-            TextSize = 48,
-            IsAntialias = true,
-            Typeface = SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold)
-        };
-        canvas.DrawText("Anleitung", PageMargin, y + 48, sectionPaint);
-        y += 70;
-
-        using var textPaint = new SKPaint
-        {
-            Color = SKColors.Black,
-            TextSize = 32,
-            IsAntialias = true,
-            Typeface = SKTypeface.FromFamilyName("Arial")
-        };
-
-        string[] steps =
-        [
-            "1. Besorge alle oben aufgelisteten Bügelperlen-Farben.",
-            "2. Lege die Perlen Reihe für Reihe auf eine Steckplatte gemäß dem Muster.",
-            "3. Lege Backpapier über die Perlen.",
-            "4. Bügle vorsichtig mit einem Bügeleisen auf mittlerer Hitze,",
-            "   bis die Perlen leicht verschmelzen.",
-            "5. Lass das Muster abkühlen und löse es vorsichtig von der Platte.",
-            "6. Optional: Bügle auch die Rückseite für bessere Stabilität."
-        ];
-
-        foreach (var step in steps)
-        {
-            canvas.DrawText(step, PageMargin, y + 32, textPaint);
-            y += 50;
-        }
 
         return y;
     }

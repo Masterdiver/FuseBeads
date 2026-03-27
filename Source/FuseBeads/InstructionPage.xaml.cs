@@ -1,13 +1,13 @@
-﻿using FuseBeads.ViewModels;
+using FuseBeads.ViewModels;
 #if ANDROID
 using AndroidX.Core.View;
 #endif
 
 namespace FuseBeads;
 
-public partial class MainPage
+public partial class InstructionPage
 {
-    public MainPage(MainViewModel viewModel)
+    public InstructionPage(InstructionViewModel viewModel)
     {
         InitializeComponent();
         BindingContext = viewModel;

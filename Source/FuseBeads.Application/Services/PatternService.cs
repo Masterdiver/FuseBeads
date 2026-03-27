@@ -24,12 +24,18 @@ public class PatternService : IPatternService
             // 1. Load the source image
             var (pixels, width, height) = _imageLoader.LoadImage(imageStream);
 
-            // 2. Resize to bead grid dimensions
-            var (resized, _, _) = _imageLoader.Resize(pixels, width, height, settings.Width, settings.Height);
+            // 2. Auto-calculate grid height from aspect ratio if not specified
+            int gridHeight = settings.Height > 0
+                ? settings.Height
+                : (int)Math.Round((double)settings.Width * height / width);
+            if (gridHeight < 1) gridHeight = 1;
 
-            // 3. Map each pixel to the closest bead color
-            var pattern = new BeadPattern(settings.Height, settings.Width);
-            for (int row = 0; row < settings.Height; row++)
+            // 3. Resize to bead grid dimensions
+            var (resized, _, _) = _imageLoader.Resize(pixels, width, height, settings.Width, gridHeight);
+
+            // 4. Map each pixel to the closest bead color
+            var pattern = new BeadPattern(gridHeight, settings.Width);
+            for (int row = 0; row < gridHeight; row++)
             {
                 for (int col = 0; col < settings.Width; col++)
                 {
@@ -43,10 +49,10 @@ public class PatternService : IPatternService
                 }
             }
 
-            // 4. Render the pattern image
+            // 5. Render the pattern image
             byte[] patternImage = _renderer.RenderPattern(pattern, settings.BeadSizePx);
 
-            // 5. Build color info list
+            // 6. Build color info list
             var summary = pattern.GetColorSummary();
             var colorInfos = summary.Select(kvp => new ColorInfo
             {

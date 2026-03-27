@@ -4,6 +4,7 @@
              xmlns:vm="clr-namespace:FuseBeads.ViewModels"
              x:Class="FuseBeads.MainPage"
              x:DataType="vm:MainViewModel"
+             Shell.NavBarIsVisible="False"
              Title="Bügelperlen-Designer">
 
     <Grid RowDefinitions="Auto,*,Auto" Padding="16">
@@ -21,7 +22,7 @@
                    TextColor="{StaticResource Primary}" />
 
             <!-- Settings -->
-            <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="10" Padding="0,4">
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10" Padding="0,4">
                 <Button Text="📷 Bild auswählen"
                         Command="{Binding PickImageCommand}"
                         IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
@@ -30,9 +31,6 @@
 
                 <Label Text="Breite:" VerticalOptions="Center" Grid.Column="1" />
                 <Entry Text="{Binding GridWidth}" Keyboard="Numeric" WidthRequest="60" Grid.Column="2" />
-
-                <Label Text="Höhe:" VerticalOptions="Center" Grid.Column="3" />
-                <Entry Text="{Binding GridHeight}" Keyboard="Numeric" WidthRequest="60" Grid.Column="4" />
             </Grid>
 
             <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
@@ -43,12 +41,12 @@
         <ScrollView Grid.Row="1" Padding="0,8,0,0">
             <VerticalStackLayout Spacing="16">
 
-                <!-- Images side by side -->
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="16"
-                      IsVisible="{Binding HasPattern}">
+                <!-- Images stacked vertically -->
+                <VerticalStackLayout Spacing="16"
+                                     IsVisible="{Binding HasPattern}">
 
                     <!-- Original Image -->
-                    <Border Grid.Column="0" Padding="8"
+                    <Border Padding="8"
                             StrokeShape="RoundRectangle 8"
                             Stroke="{StaticResource Primary}">
                         <VerticalStackLayout Spacing="4">
@@ -59,18 +57,25 @@
                         </VerticalStackLayout>
                     </Border>
 
-                    <!-- Pattern Image -->
-                    <Border Grid.Column="1" Padding="8"
+                    <!-- Pattern Image (scrollable/zoomable) -->
+                    <Border Padding="8"
                             StrokeShape="RoundRectangle 8"
                             Stroke="{StaticResource Primary}">
                         <VerticalStackLayout Spacing="4">
                             <Label Text="Bügelperlenmuster" FontAttributes="Bold"
                                    HorizontalOptions="Center" />
-                            <Image Source="{Binding PatternImageSource}"
-                                   Aspect="AspectFit" MaximumHeightRequest="400" />
+                            <ScrollView Orientation="Both"
+                                        MaximumHeightRequest="500"
+                                        HorizontalScrollBarVisibility="Always"
+                                        VerticalScrollBarVisibility="Always">
+                                <Image Source="{Binding PatternImageSource}"
+                                       Aspect="AspectFit"
+                                       MinimumWidthRequest="300"
+                                       MinimumHeightRequest="300" />
+                            </ScrollView>
                         </VerticalStackLayout>
                     </Border>
-                </Grid>
+                </VerticalStackLayout>
 
                 <!-- Stats -->
                 <Border Padding="12" StrokeShape="RoundRectangle 8"
@@ -105,9 +110,9 @@
                         IsVisible="{Binding HasPattern}"
                         Stroke="{StaticResource Primary}">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Farbenliste &amp; Anleitung" FontSize="18"
+                        <Label Text="Farbenliste" FontSize="18"
                                FontAttributes="Bold" />
-                        <Label Text="Sortiert nach Anzahl — kaufe die folgenden Bügelperlen-Farben:"
+                        <Label Text="Sortiert nach Anzahl"
                                FontSize="12" TextColor="Gray" />
 
                         <!-- Column Headers -->
@@ -145,30 +150,18 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Instructions -->
-                <Border Padding="12" StrokeShape="RoundRectangle 8"
-                        IsVisible="{Binding HasPattern}"
-                        Stroke="{StaticResource Primary}">
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Anleitung" FontSize="18" FontAttributes="Bold" />
-                        <Label Text="1. Besorge alle oben aufgelisteten Bügelperlen-Farben." FontSize="14" />
-                        <Label Text="2. Lege die Perlen Reihe für Reihe auf eine Steckplatte gemäß dem Muster." FontSize="14" />
-                        <Label Text="3. Lege Backpapier über die Perlen." FontSize="14" />
-                        <Label Text="4. Bügle vorsichtig mit einem Bügeleisen auf mittlerer Hitze, bis die Perlen leicht verschmelzen." FontSize="14" />
-                        <Label Text="5. Lass das Muster abkühlen und löse es vorsichtig von der Platte." FontSize="14" />
-                        <Label Text="6. Optional: Bügle auch die Rückseite für bessere Stabilität." FontSize="14" />
-                    </VerticalStackLayout>
-                </Border>
 
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- Print Button -->
-        <Button Grid.Row="2"
-                Text="🖨️ Drucken"
-                Command="{Binding PrintCommand}"
-                IsEnabled="{Binding HasPattern}"
-                Margin="0,8,0,0" />
+        <HorizontalStackLayout Grid.Row="2" Spacing="12" HorizontalOptions="Center" Margin="0,8,0,0">
+            <Button Text="📋 Leganleitung"
+                    Command="{Binding ShowInstructionsCommand}"
+                    IsEnabled="{Binding HasPattern}" />
+            <Button Text="🖨️ Drucken"
+                    Command="{Binding PrintCommand}"
+                    IsEnabled="{Binding HasPattern}" />
+        </HorizontalStackLayout>
     </Grid>
 
 </ContentPage>

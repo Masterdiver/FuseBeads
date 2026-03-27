@@ -23,6 +23,8 @@ namespace FuseBeads
             // Presentation layer registrations
             builder.Services.AddTransient<MainViewModel>();
             builder.Services.AddTransient<MainPage>();
+            builder.Services.AddTransient<InstructionViewModel>();
+            builder.Services.AddTransient<InstructionPage>();
 
 #if DEBUG
     		builder.Logging.AddDebug();

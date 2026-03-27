@@ -37,7 +37,7 @@ public partial class MainViewModel : ObservableObject
     private int _gridWidth = 29;
 
     [ObservableProperty]
-    private int _gridHeight = 29;
+    private int _gridHeight;
 
     [ObservableProperty]
     private int _totalBeads;
@@ -82,11 +82,12 @@ public partial class MainViewModel : ObservableObject
             var settings = new PatternSettings
             {
                 Width = GridWidth,
-                Height = GridHeight,
+                Height = 0,
                 BeadSizePx = 20
             };
 
             var patternResult = await _patternService.GeneratePatternAsync(stream, settings);
+            GridHeight = patternResult.Pattern.Rows;
 
             // Update pattern image
             PatternImageSource = ImageSource.FromStream(() => new MemoryStream(patternResult.PatternImage));
@@ -152,6 +153,18 @@ public partial class MainViewModel : ObservableObject
         {
             IsBusy = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task ShowInstructionsAsync()
+    {
+        if (_lastPatternResult is null)
+            return;
+
+        await Shell.Current.GoToAsync("InstructionPage", new Dictionary<string, object>
+        {
+            ["Pattern"] = _lastPatternResult.Pattern
+        });
     }
 }
 
