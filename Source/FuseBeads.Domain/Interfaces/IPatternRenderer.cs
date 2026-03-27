@@ -11,4 +11,9 @@ public interface IPatternRenderer
     /// Renders the pattern as a PNG image byte array.
     /// </summary>
     byte[] RenderPattern(BeadPattern pattern, int beadSizePx = 20);
+
+    /// <summary>
+    /// Renders the pattern with board grid overlay.
+    /// </summary>
+    byte[] RenderPattern(BeadPattern pattern, int beadSizePx, int boardWidth, int boardHeight);
 }

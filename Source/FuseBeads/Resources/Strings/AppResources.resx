@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter</value></resheader>
+
+  <!-- App Title -->
+  <data name="AppTitle" xml:space="preserve"><value>Bügelperlen-Muster Generator</value></data>
+  <data name="PageTitle" xml:space="preserve"><value>Bügelperlen-Designer</value></data>
+
+  <!-- Buttons -->
+  <data name="PickImage" xml:space="preserve"><value>📷 Bild auswählen</value></data>
+  <data name="Instructions" xml:space="preserve"><value>📋 Leganleitung</value></data>
+  <data name="Print" xml:space="preserve"><value>🖨️ Drucken</value></data>
+  <data name="ExportPdf" xml:space="preserve"><value>📄 PDF</value></data>
+  <data name="Save" xml:space="preserve"><value>💾 Speichern</value></data>
+  <data name="Load" xml:space="preserve"><value>📂 Laden</value></data>
+  <data name="ShoppingList" xml:space="preserve"><value>🛒 Einkaufsliste</value></data>
+  <data name="Undo" xml:space="preserve"><value>↩ Rückgängig</value></data>
+  <data name="Redo" xml:space="preserve"><value>↪ Wiederholen</value></data>
+  <data name="Back" xml:space="preserve"><value>← Zurück</value></data>
+  <data name="Regenerate" xml:space="preserve"><value>🔄 Aktualisieren</value></data>
+
+  <!-- Labels -->
+  <data name="Width" xml:space="preserve"><value>Breite:</value></data>
+  <data name="Palette" xml:space="preserve"><value>Palette:</value></data>
+  <data name="MaxColors" xml:space="preserve"><value>Max Farben:</value></data>
+  <data name="ImageAdjustments" xml:space="preserve"><value>Bildanpassungen</value></data>
+  <data name="Brightness" xml:space="preserve"><value>Helligkeit:</value></data>
+  <data name="Contrast" xml:space="preserve"><value>Kontrast:</value></data>
+  <data name="Saturation" xml:space="preserve"><value>Sättigung:</value></data>
+  <data name="Dithering" xml:space="preserve"><value>Dithering</value></data>
+  <data name="BoardGrid" xml:space="preserve"><value>Plattenraster</value></data>
+  <data name="OriginalImage" xml:space="preserve"><value>Originalbild</value></data>
+  <data name="BeadPattern" xml:space="preserve"><value>Bügelperlenmuster</value></data>
+  <data name="TotalBeads" xml:space="preserve"><value>Perlen gesamt</value></data>
+  <data name="Colors" xml:space="preserve"><value>Farben</value></data>
+  <data name="Grid" xml:space="preserve"><value>Raster</value></data>
+  <data name="ColorList" xml:space="preserve"><value>Farbenliste</value></data>
+  <data name="SortedByCount" xml:space="preserve"><value>Sortiert nach Anzahl</value></data>
+  <data name="Color" xml:space="preserve"><value>Farbe</value></data>
+  <data name="Count" xml:space="preserve"><value>Anzahl</value></data>
+  <data name="InstructionTitle" xml:space="preserve"><value>Leganleitung</value></data>
+  <data name="Row" xml:space="preserve"><value>Reihe</value></data>
+
+  <!-- Status Messages -->
+  <data name="StatusInitial" xml:space="preserve"><value>Wähle ein Bild aus, um ein Bügelperlenmuster zu erstellen.</value></data>
+  <data name="StatusProcessing" xml:space="preserve"><value>Bild wird verarbeitet...</value></data>
+  <data name="StatusPatternCreated" xml:space="preserve"><value>Muster erstellt: {0}×{1} = {2} Perlen, {3} Farben</value></data>
+  <data name="StatusPrinting" xml:space="preserve"><value>Druckseite wird erstellt...</value></data>
+  <data name="StatusPrinted" xml:space="preserve"><value>Druckseite erstellt.</value></data>
+  <data name="StatusPdfCreating" xml:space="preserve"><value>PDF wird erstellt...</value></data>
+  <data name="StatusPdfCreated" xml:space="preserve"><value>PDF erstellt.</value></data>
+  <data name="StatusSaving" xml:space="preserve"><value>Muster wird gespeichert...</value></data>
+  <data name="StatusSaved" xml:space="preserve"><value>Muster gespeichert.</value></data>
+  <data name="StatusLoading" xml:space="preserve"><value>Muster wird geladen...</value></data>
+  <data name="StatusLoaded" xml:space="preserve"><value>Muster geladen: {0}×{1} = {2} Perlen</value></data>
+  <data name="ErrorPrefix" xml:space="preserve"><value>Fehler: {0}</value></data>
+  <data name="ErrorPrinting" xml:space="preserve"><value>Fehler beim Drucken: {0}</value></data>
+  <data name="ErrorPdf" xml:space="preserve"><value>Fehler beim PDF-Export: {0}</value></data>
+  <data name="ErrorSaving" xml:space="preserve"><value>Fehler beim Speichern: {0}</value></data>
+  <data name="ErrorLoading" xml:space="preserve"><value>Fehler beim Laden: {0}</value></data>
+
+  <!-- Print Renderer -->
+  <data name="PrintTitle" xml:space="preserve"><value>Bügelperlen-Muster</value></data>
+  <data name="PrintGrid" xml:space="preserve"><value>Raster</value></data>
+  <data name="PrintTotalBeads" xml:space="preserve"><value>Perlen gesamt</value></data>
+  <data name="PrintColors" xml:space="preserve"><value>Farben</value></data>
+  <data name="PrintPattern" xml:space="preserve"><value>Muster</value></data>
+  <data name="PrintColorList" xml:space="preserve"><value>Farbenliste</value></data>
+  <data name="PrintColorColumn" xml:space="preserve"><value>Farbe</value></data>
+  <data name="PrintNameColumn" xml:space="preserve"><value>Name</value></data>
+  <data name="PrintCountColumn" xml:space="preserve"><value>Anzahl</value></data>
+
+  <!-- Share -->
+  <data name="SharePrintTitle" xml:space="preserve"><value>Bügelperlen-Muster drucken</value></data>
+  <data name="SharePdfTitle" xml:space="preserve"><value>Bügelperlen-Muster als PDF</value></data>
+  <data name="ShareSaveTitle" xml:space="preserve"><value>Bügelperlen-Muster speichern</value></data>
+  <data name="ShareShoppingListTitle" xml:space="preserve"><value>Einkaufsliste</value></data>
+  <data name="PickImageTitle" xml:space="preserve"><value>Bild auswählen</value></data>
+  <data name="LoadPatternTitle" xml:space="preserve"><value>Muster laden</value></data>
+</root>

@@ -14,4 +14,9 @@ public interface IImageLoader
     /// Resizes pixel data to the target dimensions.
     /// </summary>
     (byte[] Pixels, int Width, int Height) Resize(byte[] pixels, int srcWidth, int srcHeight, int targetWidth, int targetHeight);
+
+    /// <summary>
+    /// Adjusts image brightness, contrast, and saturation.
+    /// </summary>
+    byte[] AdjustImage(byte[] pixels, int width, int height, float brightness, float contrast, float saturation);
 }

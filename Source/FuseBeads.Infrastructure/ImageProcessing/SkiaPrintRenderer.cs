@@ -1,5 +1,6 @@
 using FuseBeads.Domain.Entities;
 using FuseBeads.Domain.Interfaces;
+using FuseBeads.Infrastructure.Resources;
 using SkiaSharp;
 
 namespace FuseBeads.Infrastructure.ImageProcessing;
@@ -28,10 +29,35 @@ public class SkiaPrintRenderer : IPrintRenderer
         y = DrawTitle(canvas, y);
         y = DrawStats(canvas, y, pattern, colorSummary.Count);
         y = DrawPatternImage(canvas, y, pattern, beadSizePx);
-        y = DrawColorLegend(canvas, y, colorSummary, totalBeads);
+        DrawColorLegend(canvas, y, colorSummary, totalBeads);
 
         using var image = surface.Snapshot();
         using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+        return data.ToArray();
+    }
+
+    public byte[] RenderPrintPageAsPdf(BeadPattern pattern, int beadSizePx = 20)
+    {
+        var colorSummary = pattern.GetColorSummary();
+        int pageHeight = CalculatePageHeight(colorSummary.Count);
+
+        using var stream = new SKDynamicMemoryWStream();
+        using var document = SKDocument.CreatePdf(stream);
+
+        using var pageCanvas = document.BeginPage(PageWidth, pageHeight);
+
+        pageCanvas.Clear(SKColors.White);
+
+        float y = PageMargin;
+        y = DrawTitle(pageCanvas, y);
+        y = DrawStats(pageCanvas, y, pattern, colorSummary.Count);
+        y = DrawPatternImage(pageCanvas, y, pattern, beadSizePx);
+        DrawColorLegend(pageCanvas, y, colorSummary, pattern.TotalBeads);
+
+        document.EndPage();
+        document.Close();
+
+        var data = stream.DetachAsData();
         return data.ToArray();
     }
 
@@ -45,26 +71,21 @@ public class SkiaPrintRenderer : IPrintRenderer
 
     private static float DrawTitle(SKCanvas canvas, float y)
     {
-        using var titlePaint = new SKPaint
-        {
-            Color = SKColors.Black,
-            TextSize = 72,
-            IsAntialias = true,
-            Typeface = SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold)
-        };
+        using var titlePaint = new SKPaint();
+        titlePaint.Color = SKColors.Black;
+        titlePaint.IsAntialias = true;
+        using var titleFont = new SKFont(SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold), 72);
 
-        string title = "Bügelperlen-Muster";
-        float titleWidth = titlePaint.MeasureText(title);
-        canvas.DrawText(title, (PageWidth - titleWidth) / 2f, y + 72, titlePaint);
+        string title = PrintResources.PrintTitle;
+        float titleWidth = titleFont.MeasureText(title);
+        canvas.DrawText(title, (PageWidth - titleWidth) / 2f, y + 72, SKTextAlign.Left, titleFont, titlePaint);
         y += 110;
 
         // Separator line
-        using var linePaint = new SKPaint
-        {
-            Color = new SKColor(200, 200, 200),
-            StrokeWidth = 2,
-            Style = SKPaintStyle.Stroke
-        };
+        using var linePaint = new SKPaint();
+        linePaint.Color = new SKColor(200, 200, 200);
+        linePaint.StrokeWidth = 2;
+        linePaint.Style = SKPaintStyle.Stroke;
         canvas.DrawLine(PageMargin, y, PageWidth - PageMargin, y, linePaint);
         y += 30;
 
@@ -73,42 +94,34 @@ public class SkiaPrintRenderer : IPrintRenderer
 
     private static float DrawStats(SKCanvas canvas, float y, BeadPattern pattern, int colorCount)
     {
-        using var labelPaint = new SKPaint
-        {
-            Color = new SKColor(100, 100, 100),
-            TextSize = 36,
-            IsAntialias = true,
-            Typeface = SKTypeface.FromFamilyName("Arial")
-        };
-        using var valuePaint = new SKPaint
-        {
-            Color = SKColors.Black,
-            TextSize = 44,
-            IsAntialias = true,
-            Typeface = SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold)
-        };
+        using var labelPaint = new SKPaint();
+        labelPaint.Color = new SKColor(100, 100, 100);
+        labelPaint.IsAntialias = true;
+        using var labelFont = new SKFont(SKTypeface.FromFamilyName("Arial"), 36);
+        using var valuePaint = new SKPaint();
+        valuePaint.Color = SKColors.Black;
+        valuePaint.IsAntialias = true;
+        using var valueFont = new SKFont(SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold), 44);
 
         float colWidth = ContentWidth / 3f;
 
         // Row 1: Labels
-        canvas.DrawText("Raster", PageMargin, y + 36, labelPaint);
-        canvas.DrawText("Perlen gesamt", PageMargin + colWidth, y + 36, labelPaint);
-        canvas.DrawText("Farben", PageMargin + colWidth * 2, y + 36, labelPaint);
+        canvas.DrawText(PrintResources.PrintGrid, PageMargin, y + 36, SKTextAlign.Left, labelFont, labelPaint);
+        canvas.DrawText(PrintResources.PrintTotalBeads, PageMargin + colWidth, y + 36, SKTextAlign.Left, labelFont, labelPaint);
+        canvas.DrawText(PrintResources.PrintColors, PageMargin + colWidth * 2, y + 36, SKTextAlign.Left, labelFont, labelPaint);
         y += 50;
 
         // Row 2: Values
-        canvas.DrawText($"{pattern.Columns} × {pattern.Rows}", PageMargin, y + 44, valuePaint);
-        canvas.DrawText($"{pattern.TotalBeads}", PageMargin + colWidth, y + 44, valuePaint);
-        canvas.DrawText($"{colorCount}", PageMargin + colWidth * 2, y + 44, valuePaint);
+        canvas.DrawText($"{pattern.Columns} × {pattern.Rows}", PageMargin, y + 44, SKTextAlign.Left, valueFont, valuePaint);
+        canvas.DrawText($"{pattern.TotalBeads}", PageMargin + colWidth, y + 44, SKTextAlign.Left, valueFont, valuePaint);
+        canvas.DrawText($"{colorCount}", PageMargin + colWidth * 2, y + 44, SKTextAlign.Left, valueFont, valuePaint);
         y += 70;
 
         // Separator
-        using var linePaint = new SKPaint
-        {
-            Color = new SKColor(220, 220, 220),
-            StrokeWidth = 1,
-            Style = SKPaintStyle.Stroke
-        };
+        using var linePaint = new SKPaint();
+        linePaint.Color = new SKColor(220, 220, 220);
+        linePaint.StrokeWidth = 1;
+        linePaint.Style = SKPaintStyle.Stroke;
         canvas.DrawLine(PageMargin, y, PageWidth - PageMargin, y, linePaint);
         y += 20;
 
@@ -117,14 +130,11 @@ public class SkiaPrintRenderer : IPrintRenderer
 
     private static float DrawPatternImage(SKCanvas canvas, float y, BeadPattern pattern, int beadSizePx)
     {
-        using var sectionPaint = new SKPaint
-        {
-            Color = SKColors.Black,
-            TextSize = 48,
-            IsAntialias = true,
-            Typeface = SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold)
-        };
-        canvas.DrawText("Muster", PageMargin, y + 48, sectionPaint);
+        using var sectionPaint = new SKPaint();
+        sectionPaint.Color = SKColors.Black;
+        sectionPaint.IsAntialias = true;
+        using var sectionFont = new SKFont(SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold), 48);
+        canvas.DrawText(PrintResources.PrintPattern, PageMargin, y + 48, SKTextAlign.Left, sectionFont, sectionPaint);
         y += 70;
 
         // Render the pattern inline
@@ -142,20 +152,17 @@ public class SkiaPrintRenderer : IPrintRenderer
         var pc = patternSurface.Canvas;
         pc.Clear(SKColors.White);
 
-        using var beadPaint = new SKPaint { IsAntialias = true };
-        using var gridPaint = new SKPaint
-        {
-            Color = new SKColor(200, 200, 200),
-            Style = SKPaintStyle.Stroke,
-            StrokeWidth = 0.5f,
-            IsAntialias = true
-        };
-        using var holePaint = new SKPaint
-        {
-            Color = new SKColor(255, 255, 255, 80),
-            Style = SKPaintStyle.Fill,
-            IsAntialias = true
-        };
+        using var beadPaint = new SKPaint();
+        beadPaint.IsAntialias = true;
+        using var gridPaint = new SKPaint();
+        gridPaint.Color = new SKColor(200, 200, 200);
+        gridPaint.Style = SKPaintStyle.Stroke;
+        gridPaint.StrokeWidth = 0.5f;
+        gridPaint.IsAntialias = true;
+        using var holePaint = new SKPaint();
+        holePaint.Color = new SKColor(255, 255, 255, 80);
+        holePaint.Style = SKPaintStyle.Fill;
+        holePaint.IsAntialias = true;
 
         float margin = beadSizePx * 0.08f;
         float beadRadius = (beadSizePx - margin * 2) / 2f;
@@ -187,82 +194,62 @@ public class SkiaPrintRenderer : IPrintRenderer
         canvas.DrawImage(patternImage, destRect);
 
         // Border around pattern
-        using var borderPaint = new SKPaint
-        {
-            Color = new SKColor(180, 180, 180),
-            Style = SKPaintStyle.Stroke,
-            StrokeWidth = 2
-        };
+        using var borderPaint = new SKPaint();
+        borderPaint.Color = new SKColor(180, 180, 180);
+        borderPaint.Style = SKPaintStyle.Stroke;
+        borderPaint.StrokeWidth = 2;
         canvas.DrawRect(destRect, borderPaint);
 
         y += drawHeight + 30;
 
         // Separator
-        using var linePaint = new SKPaint
-        {
-            Color = new SKColor(220, 220, 220),
-            StrokeWidth = 1,
-            Style = SKPaintStyle.Stroke
-        };
+        using var linePaint = new SKPaint();
+        linePaint.Color = new SKColor(220, 220, 220);
+        linePaint.StrokeWidth = 1;
+        linePaint.Style = SKPaintStyle.Stroke;
         canvas.DrawLine(PageMargin, y, PageWidth - PageMargin, y, linePaint);
         y += 20;
 
         return y;
     }
 
-    private static float DrawColorLegend(SKCanvas canvas, float y, Dictionary<BeadColor, int> colorSummary, int totalBeads)
+    private static void DrawColorLegend(SKCanvas canvas, float y, Dictionary<BeadColor, int> colorSummary, int totalBeads)
     {
-        using var sectionPaint = new SKPaint
-        {
-            Color = SKColors.Black,
-            TextSize = 48,
-            IsAntialias = true,
-            Typeface = SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold)
-        };
-        canvas.DrawText("Farbenliste", PageMargin, y + 48, sectionPaint);
+        using var sectionPaint = new SKPaint();
+        sectionPaint.Color = SKColors.Black;
+        sectionPaint.IsAntialias = true;
+        using var sectionFont = new SKFont(SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold), 48);
+        canvas.DrawText(PrintResources.PrintColorList, PageMargin, y + 48, SKTextAlign.Left, sectionFont, sectionPaint);
         y += 70;
 
         // Column headers
-        using var headerPaint = new SKPaint
-        {
-            Color = new SKColor(80, 80, 80),
-            TextSize = 32,
-            IsAntialias = true,
-            Typeface = SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold)
-        };
+        using var headerPaint = new SKPaint();
+        headerPaint.Color = new SKColor(80, 80, 80);
+        headerPaint.IsAntialias = true;
+        using var headerFont = new SKFont(SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold), 32);
 
-        float colColor = PageMargin + 60;
         float colName = PageMargin + 300;
         float colCount = PageMargin + ContentWidth - 500;
         float colPercent = PageMargin + ContentWidth - 200;
 
-        canvas.DrawText("Farbe", PageMargin + 60, y + 32, headerPaint);
-        canvas.DrawText("Name", colName, y + 32, headerPaint);
-        canvas.DrawText("Anzahl", colCount, y + 32, headerPaint);
-        canvas.DrawText("%", colPercent, y + 32, headerPaint);
+        canvas.DrawText(PrintResources.PrintColorColumn, PageMargin + 60, y + 32, SKTextAlign.Left, headerFont, headerPaint);
+        canvas.DrawText(PrintResources.PrintNameColumn, colName, y + 32, SKTextAlign.Left, headerFont, headerPaint);
+        canvas.DrawText(PrintResources.PrintCountColumn, colCount, y + 32, SKTextAlign.Left, headerFont, headerPaint);
+        canvas.DrawText("%", colPercent, y + 32, SKTextAlign.Left, headerFont, headerPaint);
         y += 50;
 
-        using var namePaint = new SKPaint
-        {
-            Color = SKColors.Black,
-            TextSize = 30,
-            IsAntialias = true,
-            Typeface = SKTypeface.FromFamilyName("Arial")
-        };
-        using var hexPaint = new SKPaint
-        {
-            Color = new SKColor(120, 120, 120),
-            TextSize = 24,
-            IsAntialias = true,
-            Typeface = SKTypeface.FromFamilyName("Arial")
-        };
-        using var countPaint = new SKPaint
-        {
-            Color = SKColors.Black,
-            TextSize = 30,
-            IsAntialias = true,
-            Typeface = SKTypeface.FromFamilyName("Arial")
-        };
+        using var namePaint = new SKPaint();
+        namePaint.Color = SKColors.Black;
+        namePaint.IsAntialias = true;
+        using var nameFont = new SKFont(SKTypeface.FromFamilyName("Arial"), 30);
+        using var hexPaint = new SKPaint();
+        hexPaint.Color = new SKColor(120, 120, 120);
+        hexPaint.IsAntialias = true;
+        using var hexFont = new SKFont(SKTypeface.FromFamilyName("Arial"), 24);
+        using var countPaint = new SKPaint();
+        countPaint.Color = SKColors.Black;
+        countPaint.IsAntialias = true;
+        using var countFont = new SKFont(SKTypeface.FromFamilyName("Arial"), 30);
 
         foreach (var kvp in colorSummary)
         {
@@ -271,47 +258,38 @@ public class SkiaPrintRenderer : IPrintRenderer
             double percentage = Math.Round(100.0 * count / totalBeads, 1);
 
             // Color swatch
-            using var swatchPaint = new SKPaint
-            {
-                Color = new SKColor(color.R, color.G, color.B),
-                Style = SKPaintStyle.Fill,
-                IsAntialias = true
-            };
+            using var swatchPaint = new SKPaint();
+            swatchPaint.Color = new SKColor(color.R, color.G, color.B);
+            swatchPaint.Style = SKPaintStyle.Fill;
+            swatchPaint.IsAntialias = true;
             canvas.DrawCircle(PageMargin + 25, y + 18, 18, swatchPaint);
 
-            using var swatchBorder = new SKPaint
-            {
-                Color = new SKColor(180, 180, 180),
-                Style = SKPaintStyle.Stroke,
-                StrokeWidth = 1,
-                IsAntialias = true
-            };
+            using var swatchBorder = new SKPaint();
+            swatchBorder.Color = new SKColor(180, 180, 180);
+            swatchBorder.Style = SKPaintStyle.Stroke;
+            swatchBorder.StrokeWidth = 1;
+            swatchBorder.IsAntialias = true;
             canvas.DrawCircle(PageMargin + 25, y + 18, 18, swatchBorder);
 
             // Color name + hex
-            canvas.DrawText(color.Name, colName, y + 22, namePaint);
-            canvas.DrawText(color.HexCode, colName, y + 48, hexPaint);
+            canvas.DrawText(color.Name, colName, y + 22, SKTextAlign.Left, nameFont, namePaint);
+            canvas.DrawText(color.HexCode, colName, y + 48, SKTextAlign.Left, hexFont, hexPaint);
 
             // Count
-            canvas.DrawText(count.ToString(), colCount, y + 30, countPaint);
+            canvas.DrawText(count.ToString(), colCount, y + 30, SKTextAlign.Left, countFont, countPaint);
 
             // Percentage
-            canvas.DrawText($"{percentage:F1}%", colPercent, y + 30, countPaint);
+            canvas.DrawText($"{percentage:F1}%", colPercent, y + 30, SKTextAlign.Left, countFont, countPaint);
 
             y += 55;
         }
 
         y += 10;
         // Separator
-        using var linePaint = new SKPaint
-        {
-            Color = new SKColor(220, 220, 220),
-            StrokeWidth = 1,
-            Style = SKPaintStyle.Stroke
-        };
+        using var linePaint = new SKPaint();
+        linePaint.Color = new SKColor(220, 220, 220);
+        linePaint.StrokeWidth = 1;
+        linePaint.Style = SKPaintStyle.Stroke;
         canvas.DrawLine(PageMargin, y, PageWidth - PageMargin, y, linePaint);
-        y += 20;
-
-        return y;
     }
 }

@@ -15,4 +15,19 @@
     <ProjectReference Include="..\FuseBeads.Application\FuseBeads.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Resources\PrintResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PrintResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\PrintResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>PrintResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

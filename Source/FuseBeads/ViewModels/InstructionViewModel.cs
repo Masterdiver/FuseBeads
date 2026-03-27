@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FuseBeads.Domain.Entities;
+using FuseBeads.Resources.Strings;
 using System.Collections.ObjectModel;
 
 namespace FuseBeads.ViewModels;
@@ -9,7 +10,7 @@ namespace FuseBeads.ViewModels;
 public partial class InstructionViewModel : ObservableObject, IQueryAttributable
 {
     [ObservableProperty]
-    private string _title = "Leganleitung";
+    private string _title = AppResources.InstructionTitle;
 
     public ObservableCollection<InstructionRowViewModel> Rows { get; } = [];
 

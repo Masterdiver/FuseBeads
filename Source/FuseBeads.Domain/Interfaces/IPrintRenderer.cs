@@ -8,4 +8,5 @@ namespace FuseBeads.Domain.Interfaces;
 public interface IPrintRenderer
 {
     byte[] RenderPrintPage(BeadPattern pattern, int beadSizePx = 20);
+    byte[] RenderPrintPageAsPdf(BeadPattern pattern, int beadSizePx = 20);
 }

@@ -7,13 +7,13 @@ public class BeadPattern
 {
     public int Rows { get; }
     public int Columns { get; }
-    public BeadCell[,] Grid { get; }
+    public BeadCell?[,] Grid { get; }
 
     public BeadPattern(int rows, int columns)
     {
         Rows = rows;
         Columns = columns;
-        Grid = new BeadCell[rows, columns];
+        Grid = new BeadCell?[rows, columns];
     }
 
     public void SetCell(int row, int column, BeadColor color)
@@ -45,4 +45,20 @@ public class BeadPattern
     }
 
     public int TotalBeads => Rows * Columns;
+
+    public string ToShoppingList()
+    {
+        var summary = GetColorSummary();
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine($"Shopping List - {Columns}×{Rows} ({TotalBeads} beads)");
+        sb.AppendLine(new string('-', 40));
+        foreach (var kvp in summary)
+        {
+            double pct = Math.Round(100.0 * kvp.Value / TotalBeads, 1);
+            sb.AppendLine($"{kvp.Key.Name,-20} {kvp.Value,6}  ({pct:F1}%)");
+        }
+        sb.AppendLine(new string('-', 40));
+        sb.AppendLine($"{"Total",-20} {TotalBeads,6}");
+        return sb.ToString();
+    }
 }
